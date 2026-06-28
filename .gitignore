@@ -1,1 +1,23 @@
-%USERPROFILE%/ 
+# Dependencies
+node_modules/
+%USERPROFILE%/
+
+# Build outputs
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
