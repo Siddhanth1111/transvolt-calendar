@@ -114,9 +114,9 @@ cd frontend
 npm run dev
 ```
 
-- **Frontend**: http://localhost:5173
-- **Backend API**: http://localhost:5000
-- **Health Check**: http://localhost:5000/api/health
+- **Frontend**: https://transvolt-calendar.vercel.app/
+- **Backend API**: https://transvolt-calendar-65zk.vercel.app/
+- **Health Check**: https://transvolt-calendar-65zk.vercel.app/api/health
 
 ---
 
@@ -383,3 +383,22 @@ transvolt/
 ## 📄 License
 
 MIT
+
+---
+
+## Theory Questions
+
+### 1. Scaling to One Million Users
+**Q: How would you redesign the backend to efficiently retrieve events, support recurring events, and prevent inconsistencies when multiple devices edit the same event?**
+
+*   **Efficient Retrieval (Scaling Reads):** I would implement **database sharding** in MongoDB using `userId` as the shard key, ensuring a single user's events are co-located on the same shard. I would also introduce a distributed caching layer (like **Redis**) to cache the current and next month's events for active users, drastically reducing database read loads.
+*   **Recurring Events:** For a massive scale, calculating recurrences on-the-fly during read requests becomes too CPU-intensive. Instead, I would use an asynchronous worker queue (e.g., BullMQ) to **materialize recurring instances** into the database or cache for a rolling time window (e.g., the next 2 years). This optimizes for read-heavy workloads at the cost of slightly more storage.
+*   **Preventing Inconsistencies (Concurrency):** I would implement **Optimistic Concurrency Control (OCC)** using document versioning (e.g., MongoDB's `__v` field). When a device updates an event, it must provide the version it last read. If another device has already modified the event (incrementing the version), the database rejects the update with a `409 Conflict`, prompting the client to pull the latest state and reconcile.
+
+### 2. Frontend Rendering Optimization
+**Q: Your calendar becomes slow when rendering thousands of events. What frontend optimization techniques would you apply to improve performance, and why would each technique help?**
+
+*   **DOM Virtualization (Windowing):** Rendering thousands of DOM nodes causes severe layout thrashing and memory bloat. By using virtualization (e.g., `react-virtual`), the DOM only renders the specific event nodes that are currently visible within the scroll viewport, recycling nodes as the user scrolls.
+*   **Memoization (`React.memo`, `useMemo`):** When dragging a single event, React might attempt to re-render the entire calendar grid. Wrapping individual event components in `React.memo` ensures that only the event whose props (e.g., position or time) actually changed will re-render, saving massive amounts of CPU cycles.
+*   **CSS Hardware Acceleration:** For drag-and-drop or resize animations, updating `top` and `left` properties triggers expensive browser layout reflows on the main thread. Instead, I would use CSS `transform: translate(x, y)` which offloads the animation rendering to the GPU (compositor thread) for smooth 60fps performance without recalculating layouts.
+*   **Debouncing & RequestAnimationFrame:** Throttling rapid firing events like `onScroll` or `onMouseMove` using `requestAnimationFrame` ensures that state updates and layout recalculations only happen once per monitor frame, preventing the main thread from choking under heavy interaction.
