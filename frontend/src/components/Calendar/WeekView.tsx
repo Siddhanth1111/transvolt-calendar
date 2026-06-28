@@ -4,12 +4,10 @@ import {
   getWeekDays,
   getDayNames,
   isToday,
-  isSameDay,
   getEventsForDay,
   formatTime,
   getEventPosition,
   createDateAtHour,
-  snapToInterval,
 } from '../../utils/dateUtils';
 import type { CalendarEvent } from '../../types';
 import { lightenColor } from '../../utils/colors';
@@ -30,7 +28,6 @@ export default function WeekView() {
   const dayNames = getDayNames();
   const bodyRef = useRef<HTMLDivElement>(null);
   const [resizingEvent, setResizingEvent] = useState<string | null>(null);
-  const [dragStartY, setDragStartY] = useState(0);
   const [dragEvent, setDragEvent] = useState<CalendarEvent | null>(null);
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
@@ -69,7 +66,6 @@ export default function WeekView() {
     e.preventDefault();
     e.stopPropagation();
     setDragEvent(event);
-    setDragStartY(e.clientY);
   };
 
   // Resize logic
@@ -77,7 +73,6 @@ export default function WeekView() {
     e.preventDefault();
     e.stopPropagation();
     setResizingEvent(eventId);
-    setDragStartY(e.clientY);
   };
 
   const handleMouseUp = useCallback(async () => {
@@ -111,8 +106,6 @@ export default function WeekView() {
     const minutes = now.getHours() * 60 + now.getMinutes();
     return (minutes / (24 * 60)) * (24 * 48); // 48px per hour
   };
-
-  const todayIndex = weekDays.findIndex((d) => isToday(d));
 
   return (
     <div className="week-view">

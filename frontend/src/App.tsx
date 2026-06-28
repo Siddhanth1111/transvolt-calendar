@@ -13,7 +13,7 @@ import RegisterPage from './pages/RegisterPage';
 
 function CalendarApp() {
   const { viewMode, isLoading } = useCalendar();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed] = useState(false);
 
   const renderView = () => {
     if (isLoading) {

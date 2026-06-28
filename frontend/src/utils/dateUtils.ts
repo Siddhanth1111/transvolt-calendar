@@ -7,7 +7,7 @@ import type { CalendarEvent } from '../types';
 export function getMonthDays(year: number, month: number): Date[] {
   const days: Date[] = [];
   const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
+
 
   // Start from Sunday of the first week
   const startDate = new Date(firstDay);

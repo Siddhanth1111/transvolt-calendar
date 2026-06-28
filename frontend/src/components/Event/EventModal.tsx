@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useCalendar } from '../../contexts/CalendarContext';
-import type { CalendarEvent, EventFormData, OverlapWarning } from '../../types';
+import type { EventFormData, OverlapWarning } from '../../types';
 import { createEvent, updateEvent, deleteEvent } from '../../api/events';
 import { EVENT_COLORS, DEFAULT_EVENT_COLOR } from '../../utils/colors';
 import { formatDateTimeLocal } from '../../utils/dateUtils';
